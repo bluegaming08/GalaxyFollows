@@ -1,0 +1,37 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1180" height="240" viewBox="0 0 1180 240">
+  <defs>
+    <linearGradient id="bg" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0" stop-color="#0d1017"/>
+      <stop offset="1" stop-color="#080a10"/>
+    </linearGradient>
+  </defs>
+  <rect width="1180" height="240" rx="16" fill="url(#bg)" stroke="#232a38"/>
+
+  <g font-family="-apple-system, Segoe UI, Helvetica, Arial, sans-serif">
+    <!-- step 1 -->
+    <rect x="30" y="46" width="330" height="130" rx="12" fill="#12161f" stroke="#2b3344"/>
+    <text x="195" y="86" fill="#4AEDD9" font-size="26" font-weight="700" text-anchor="middle">1. Follow</text>
+    <text x="195" y="120" fill="#c7cedb" font-size="16" text-anchor="middle">A player follows your account</text>
+    <text x="195" y="144" fill="#c7cedb" font-size="16" text-anchor="middle">on BlueGalaxy</text>
+
+    <!-- arrow 1 -->
+    <path d="M 368 111 h 48 m 0 0 l -10 -7 m 10 7 l -10 7" stroke="#4AEDD9" stroke-width="3" fill="none" stroke-linecap="round"/>
+
+    <!-- step 2 -->
+    <rect x="424" y="46" width="330" height="130" rx="12" fill="#12161f" stroke="#2b3344"/>
+    <text x="589" y="86" fill="#4AEDD9" font-size="26" font-weight="700" text-anchor="middle">2. Poll</text>
+    <text x="589" y="120" fill="#c7cedb" font-size="16" text-anchor="middle">The plugin checks the follow queue</text>
+    <text x="589" y="144" fill="#c7cedb" font-size="16" text-anchor="middle">every 30s over HTTPS</text>
+
+    <!-- arrow 2 -->
+    <path d="M 762 111 h 48 m 0 0 l -10 -7 m 10 7 l -10 7" stroke="#4AEDD9" stroke-width="3" fill="none" stroke-linecap="round"/>
+
+    <!-- step 3 -->
+    <rect x="818" y="46" width="332" height="130" rx="12" fill="#12161f" stroke="#2b3344"/>
+    <text x="984" y="86" fill="#4AEDD9" font-size="26" font-weight="700" text-anchor="middle">3. Reward</text>
+    <text x="984" y="120" fill="#c7cedb" font-size="16" text-anchor="middle">Your reward commands run for that</text>
+    <text x="984" y="144" fill="#c7cedb" font-size="16" text-anchor="middle">player next time they join</text>
+
+    <text x="590" y="216" fill="#8b93a3" font-size="15" text-anchor="middle">One reward per follower, forever - and follows that happen while your server is down are never lost.</text>
+  </g>
+</svg>
