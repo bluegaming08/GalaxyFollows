@@ -35,8 +35,9 @@ Ready-made downloads live at
 
 ## Install
 
-1. Drop the plugin in your server's `plugins/` folder (PocketMine: the
-   plugin folder goes in the PocketMine plugins directory).
+1. Drop the plugin in your server's `plugins/` folder (PocketMine: PM5
+   only loads `.phar` files - package the source as a phar first, see
+   the Bedrock build notes below).
 2. Start the server once. A `config.yml` is generated next to the plugin.
 3. Set your BlueGalaxy username and your reward commands:
 
@@ -73,8 +74,22 @@ PowerNukkitX: the `stubs/` folder is compile-only (a minimal `cn.nukkit`
 surface so the plugin builds without the full PowerNukkitX jar). Build
 against real PowerNukkitX for release.
 
-PocketMine: plain PHP, no build step. Copy `bedrock/pocketmine/` into your
-PocketMine `plugins/` folder as `GalaxyFollows`.
+PocketMine: plain PHP, no build step - but PocketMine-MP 5 only loads
+`.phar` files (it ignores loose source folders). Package it like this:
+
+```
+mkdir pkg/GalaxyFollows/src pkg/GalaxyFollows/resources
+cp -r bedrock/pocketmine/bluenetwork pkg/GalaxyFollows/src/
+cp bedrock/pocketmine/config.yml pkg/GalaxyFollows/resources/config.yml
+cp bedrock/pocketmine/plugin.yml pkg/GalaxyFollows/
+php -d phar.readonly=0 -r '$p = new Phar("GalaxyFollows.phar");
+  $p->buildFromDirectory("pkg/GalaxyFollows");
+  $p->setStub("<?php __HALT_COMPILER();");'
+```
+
+Then drop `GalaxyFollows.phar` into your `plugins/` folder. Boot-tested on
+PocketMine-MP 5.44.3 / PHP 8.4: enable, live API poll, /galaxyfollows
+status, clean shutdown.
 
 ## License
 

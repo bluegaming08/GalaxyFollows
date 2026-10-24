@@ -9,6 +9,7 @@ use pocketmine\command\CommandSender;
 use pocketmine\event\Listener;
 use pocketmine\player\Player;
 use pocketmine\plugin\PluginBase;
+use pocketmine\scheduler\ClosureTask;
 use pocketmine\utils\TextFormat;
 use function array_slice, count, curl_init, curl_exec, curl_close, date, in_array,
     json_decode, json_encode, md5, preg_match, sprintf, str_replace, strtolower,
@@ -69,7 +70,7 @@ final class Main extends PluginBase implements Listener
 
     protected function onDisable(): void
     {
-        $this->getScheduler()->cancelTasks($this);
+        $this->getScheduler()->cancelAllTasks();
     }
 
     #[\pocketmine\event\EventHandler]
@@ -77,7 +78,7 @@ final class Main extends PluginBase implements Listener
     {
         $this->onlineNames[$event->getPlayer()->getName()] = true;
         // a join might be a pending follower: poll 2s later
-        $this->getScheduler()->scheduleDelayedTask($this->poll(...), 40);
+        $this->getScheduler()->scheduleDelayedTask(new ClosureTask(function(): void { $this->poll(); }), 40);
     }
 
     #[\pocketmine\event\EventHandler]
@@ -105,11 +106,12 @@ final class Main extends PluginBase implements Listener
 
     private function schedulePoll(): void
     {
-        $this->getScheduler()->scheduleRepeatingTask($this->poll(...), $this->pollInterval * 20);
+        $this->getScheduler()->scheduleRepeatingTask(new ClosureTask(function(): void { $this->poll(); }), $this->pollInterval * 20);
     }
 
     private function reload(): void
     {
+        $this->getScheduler()->cancelAllTasks();
         $this->reloadConfig();
         $this->readConfig();
         $this->schedulePoll();
