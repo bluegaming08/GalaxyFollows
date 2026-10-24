@@ -1,0 +1,11 @@
+# GalaxyFollows (Bedrock) - reward players for following you on BlueGalaxy.
+galaxyfollows:
+  enabled: true
+  prefix: "&d[GalaxyFollows]&r "
+  username: "CHANGE_ME"
+  reward-commands:
+    - "give {player} diamond 1"
+  reward-message: "&bYou got a reward for following &f{account} &bon BlueGalaxy!"
+  follow-hold-hours: 24
+  poll-interval-seconds: 30
+  max-age-days: 30

@@ -1,0 +1,35 @@
+# GalaxyFollows - reward players for following you on BlueGalaxy.
+#
+# When someone follows YOUR BlueGalaxy account, they get the reward next
+# time they are on your server (or instantly if they are online).
+# One reward per follower, forever.
+
+galaxyfollows:
+  # Master switch.
+  enabled: true
+
+  # Prefix for all GalaxyFollows chat output. & color codes allowed.
+  prefix: "&d[GalaxyFollows]&r "
+
+  # YOUR BlueGalaxy username (the account whose followers get rewards).
+  username: "CHANGE_ME"
+
+  # Console commands run when a follower is rewarded.
+  # Placeholders: {player} = Minecraft username, {handle} = their BlueGalaxy
+  # handle, {account} = your username.
+  reward-commands:
+    - "give {player} diamond 1"
+
+  # Chat message sent to the rewarded player. Blank = no message.
+  reward-message: "&bYou got a reward for following &f{account} &bon BlueGalaxy!"
+
+  # Careful mode: a follow only counts after it has existed for this many
+  # HOURS. If they unfollow during the window, no reward is ever given for
+  # that follow. 0 = reward instantly.
+  follow-hold-hours: 24
+
+  # Advanced. How often to ask BlueGalaxy for new follows (seconds, min 10).
+  poll-interval-seconds: 30
+
+  # Forget pending rewards older than this many days.
+  max-age-days: 30

@@ -1,0 +1,17 @@
+name: GalaxyFollows
+version: 1.2.0
+main: net.bluenetwork.galaxyfollows.GalaxyFollowsPlugin
+description: Reward players for following your BlueGalaxy account
+author: Blue Network
+website: https://galaxy.gamer.gd
+load: POSTWORLD
+commands:
+  galaxyfollows:
+    description: GalaxyFollows status and reload
+    usage: "/galaxyfollows <status|reload>"
+    aliases: [gfollows]
+    permission: galaxyfollows.use
+permissions:
+  galaxyfollows.use:
+    description: Access to /galaxyfollows
+    default: op
