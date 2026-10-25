@@ -4,7 +4,7 @@
 
 [![License: MIT](https://img.shields.io/badge/license-MIT-4AEDD9?style=flat-square)](LICENSE)
 [![Java](https://img.shields.io/badge/Java-Paper%201.21%20%2B%2026.x-1e6f5c?style=flat-square)](java/)
-[![Bedrock](https://img.shields.io/badge/Bedrock-PocketMine%20%2B%20PowerNukkitX-1e6f5c?style=flat-square)](bedrock/)
+[![Bedrock](https://img.shields.io/badge/Bedrock-PocketMine%20%2B%20PowerNukkitX%203.x-1e6f5c?style=flat-square)](bedrock/)
 [![No API keys](https://img.shields.io/badge/config-just%20a%20username-4AEDD9?style=flat-square)](#why-you-can-trust-it)
 
 **Reward players on your Minecraft server when they follow your [BlueGalaxy](https://galaxy.gamer.gd) account.**
@@ -32,7 +32,7 @@ Someone follows you on BlueGalaxy - your server runs your reward commands the ne
     <td width="50%" align="center" valign="bottom">
       <a href="bedrock/"><img src="docs/img/edition-bedrock.webp" alt="Bedrock edition art" width="88%"></a><br>
       <b>Bedrock</b><br>
-      <sub>PocketMine-MP 5 (PHP) + PowerNukkitX 3.x<br><code>bedrock/</code></sub>
+      <sub>PocketMine-MP 5 (PHP) + PowerNukkitX 3.x (Java)<br><code>bedrock/</code></sub>
     </td>
   </tr>
 </table>
@@ -80,14 +80,7 @@ Java (needs JDK 21+):
 cd java && mvn clean package
 ```
 
-PowerNukkitX 3.x (needs JDK 21+ and the PowerNukkitX jar for the classpath):
-
-javac -cp powernukkitx.jar -d classes \
-  bedrock/powernukkitx/net/bluenetwork/galaxyfollows/*.java
-jar --create --file GalaxyFollows-1.2.0-powernukkitx.jar -C classes . \
-  -C bedrock/powernukkitx plugin.yml -C bedrock/powernukkitx config.yml
-
-Boot-tested on PowerNukkitX 3.0.5 (Bedrock 1.26.50): enable, /galaxyfollows status, clean shutdown. The 3.x API is `org.powernukkitx` (not `cn.nukkit`), so builds targeting old Nukkit-family servers are a separate, older code line and not shipped.
+PowerNukkitX 3.x: compile against the PowerNukkitX server jar (org.powernukkitx API). The old cn.nukkit stubs were removed in 1.2.1 when the edition moved to PowerNukkitX 3.x.
 
 PocketMine: plain PHP, no build step - but PocketMine-MP 5 only loads `.phar` files (it ignores loose source folders). Package it like this:
 

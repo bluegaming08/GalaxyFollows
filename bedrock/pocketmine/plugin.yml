@@ -1,5 +1,5 @@
 name: GalaxyFollows
-version: 1.2.0
+version: 1.2.1
 main: bluenetwork\galaxyfollows\Main
 api: 5.0.0
 description: Reward players for following your BlueGalaxy account

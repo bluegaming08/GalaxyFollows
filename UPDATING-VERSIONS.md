@@ -23,15 +23,14 @@ When a new Minecraft version comes out:
    (`cd java && mvn clean package`), test on a server, then ship a new
    zip and update the download page URL.
 
-## Bedrock (PowerNukkitX / Nukkit)
+## Bedrock (PowerNukkitX 3.x)
 
 PowerNukkitX follows the Bedrock protocol version, so one build usually
 spans several Bedrock releases. When a new Bedrock version drops:
 
 1. Boot a test server on the new version with the plugin installed.
 2. If it boots and `/galaxyfollows status` answers, nothing to change.
-3. If the Nukkit API changed, update `bedrock/powernukkitx/src` and
-   the matching stubs in `bedrock/powernukkitx/stubs`, rebuild.
+3. If the PNX 3.x API changed, update `bedrock/powernukkitx/src` (org.powernukkitx) and rebuild against the PowerNukkitX server jar.
 
 ## Bedrock (PocketMine-MP)
 

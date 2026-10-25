@@ -35,6 +35,9 @@ final class Main extends PluginBase implements Listener
     /** @var array<string, string> event ids currently being handled */
     private array $inflight = [];
 
+    /** Event ids whose follower has no linked MC account (warn once). @var array<string, bool> */
+    private array $warnedNoMc = [];
+
     /** @var array<string, true> exact names of online players */
     private array $onlineNames = [];
 
@@ -171,10 +174,18 @@ final class Main extends PluginBase implements Listener
             return;
         }
         if ($mc === "") {
-            // follower has no linked MC account (system accounts): ack + skip
-            $this->ackQueue[] = $id;
+            // follower has no linked MC account yet: keep the event pending -
+            // it becomes rewardable the moment they link one. Never ack it
+            // (acking would burn the reward forever).
+            if (!isset($this->warnedNoMc[$id])) {
+                $this->warnedNoMc[$id] = true;
+                $this->getLogger()->warning("Follower '@" . ($follower === "" ? "?" : $follower)
+                    . "' has no Minecraft account linked on BlueGalaxy yet. Their follow reward"
+                    . " will be delivered automatically once they link one (event stays pending).");
+            }
             return;
         }
+        unset($this->warnedNoMc[$id]);
         if (isset($this->inflight[$id])) {
             return;
         }
@@ -297,7 +308,8 @@ final class Main extends PluginBase implements Listener
             . " | hold: {$this->holdHours}h");
         $this->sendPrefixed($sender, "Rewards delivered: {$this->rewardedTotal}"
             . " | unfollows caught: {$this->droppedUnfollows}"
-            . " | pending acks: " . count($this->ackQueue));
+            . " | pending acks: " . count($this->ackQueue)
+            . " | waiting on MC link: " . count($this->warnedNoMc));
         return true;
     }
 

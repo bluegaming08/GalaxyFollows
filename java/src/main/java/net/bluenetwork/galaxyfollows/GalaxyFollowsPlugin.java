@@ -41,6 +41,9 @@ public final class GalaxyFollowsPlugin extends JavaPlugin implements Listener {
     /** Event ids we have handled but not yet acked (acked on next poll). */
     private final List<String> ackQueue = new ArrayList<>();
 
+    /** Pending events whose follower has no linked Minecraft account (warn once). */
+    private final java.util.Set<String> warnedNoMc = java.util.Collections.newSetFromMap(new java.util.concurrent.ConcurrentHashMap<>());
+
     /** Event ids currently being handled in this poll cycle. */
     private final Map<String, String> inflight = new ConcurrentHashMap<>();
 
@@ -166,12 +169,18 @@ public final class GalaxyFollowsPlugin extends JavaPlugin implements Listener {
         String followedAt = Json.str(ev, "followed_at");
         if (id == null) return;
 
-        // follower has no linked Minecraft account (system accounts):
-        // ack and skip, they can never be rewarded in-game.
+        // follower has no linked Minecraft account yet: keep the event
+        // pending - it becomes rewardable the moment they link one. Never
+        // ack it (acking would burn the reward forever).
         if (mcUsername == null || mcUsername.isBlank()) {
-            synchronized (ackQueue) { ackQueue.add(id); }
+            if (warnedNoMc.add(id)) {
+                getLogger().warning("Follower '@" + (followerHandle == null ? "?" : followerHandle)
+                        + "' has no Minecraft account linked on BlueGalaxy yet. Their follow reward"
+                        + " will be delivered automatically once they link one (event stays pending).");
+            }
             return;
         }
+        warnedNoMc.remove(id);
 
         // one delivery attempt per event per poll cycle
         if (inflight.putIfAbsent(id, mcUsername) != null) return;
@@ -319,7 +328,8 @@ public final class GalaxyFollowsPlugin extends JavaPlugin implements Listener {
                 + " | hold: " + holdHours + "h");
         sendPrefixed(sender, "Rewards delivered: " + rewardedTotal
                 + " | unfollows caught: " + droppedUnfollows
-                + " | pending acks: " + ackQueue.size());
+                + " | pending acks: " + ackQueue.size()
+                + " | waiting on MC link: " + warnedNoMc.size());
         return true;
     }
 
