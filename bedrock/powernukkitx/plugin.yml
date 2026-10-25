@@ -1,6 +1,7 @@
 name: GalaxyFollows
 version: 1.2.0
 main: net.bluenetwork.galaxyfollows.GalaxyFollowsPlugin
+api: ["3.0.0"]
 description: Reward players for following your BlueGalaxy account
 author: Blue Network
 website: https://galaxy.gamer.gd

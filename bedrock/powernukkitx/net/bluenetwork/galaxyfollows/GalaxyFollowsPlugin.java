@@ -1,17 +1,19 @@
 package net.bluenetwork.galaxyfollows;
 
-import cn.nukkit.Player;
-import cn.nukkit.Server;
-import cn.nukkit.command.Command;
-import cn.nukkit.command.CommandSender;
-import cn.nukkit.command.ConsoleCommandSender;
-import cn.nukkit.event.EventHandler;
-import cn.nukkit.event.Listener;
-import cn.nukkit.event.player.PlayerJoinEvent;
-import cn.nukkit.event.player.PlayerQuitEvent;
-import cn.nukkit.plugin.PluginBase;
-import cn.nukkit.scheduler.ServerScheduler;
-import cn.nukkit.utils.TextFormat;
+import org.powernukkitx.Player;
+import org.powernukkitx.Server;
+import org.powernukkitx.command.Command;
+import org.powernukkitx.command.CommandExecutor;
+import org.powernukkitx.command.CommandSender;
+import org.powernukkitx.command.ConsoleCommandSender;
+import org.powernukkitx.event.EventHandler;
+import org.powernukkitx.event.Listener;
+import org.powernukkitx.event.player.PlayerJoinEvent;
+import org.powernukkitx.event.player.PlayerQuitEvent;
+import org.powernukkitx.plugin.PluginBase;
+import org.powernukkitx.scheduler.ServerScheduler;
+import org.powernukkitx.scheduler.TaskHandler;
+import org.powernukkitx.utils.TextFormat;
 
 import java.io.OutputStream;
 import java.net.URI;
@@ -28,13 +30,13 @@ import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 
 /**
- * GalaxyFollows for Bedrock (Nukkit family: PowerNukkitX, NukkitX).
+ * GalaxyFollows for Bedrock, PowerNukkitX 3.x edition (org.powernukkitx API).
  *
  * Same as the Paper edition: no keys, no pairing - the plugin identifies
  * itself only with the site username it rewards. username: in config.yml,
  * pick your reward commands, done.
  */
-public final class GalaxyFollowsPlugin extends PluginBase implements Listener, cn.nukkit.command.CommandExecutor {
+public final class GalaxyFollowsPlugin extends PluginBase implements Listener, CommandExecutor {
 
     private static final String API_URL =
             "https://tybyyeeapetvzjenzjid.supabase.co/functions/v1/plugin";
@@ -55,7 +57,7 @@ public final class GalaxyFollowsPlugin extends PluginBase implements Listener, c
     private long lastPollOk = 0;
     private long rewardedTotal = 0;
     private long droppedUnfollows = 0;
-    private int taskHandle = -1;
+    private TaskHandler pollTask = null;
 
     private volatile String username = "";
     private volatile List<String> rewardCommands = List.of();
@@ -79,22 +81,21 @@ public final class GalaxyFollowsPlugin extends PluginBase implements Listener, c
             getLogger().info("GalaxyFollows enabled. Rewarding followers of '" + username
                     + "', polling every " + pollInterval + "s, hold window " + holdHours + "h.");
         } else {
-            getLogger().warning("Set your BlueGalaxy username in plugin_data/GalaxyFollows/config.yml, then run /galaxyfollows reload.");
+            getLogger().warning("Set your BlueGalaxy username in the GalaxyFollows config.yml, then run /galaxyfollows reload.");
         }
     }
 
     @Override
     public void onDisable() {
-        if (taskHandle != -1) {
-            getServer().getScheduler().cancelTask(taskHandle);
-            taskHandle = -1;
+        if (pollTask != null) {
+            pollTask.cancel();
+            pollTask = null;
         }
     }
 
     private void restartPoller() {
-        if (taskHandle != -1) getServer().getScheduler().cancelTask(taskHandle);
-        final GalaxyFollowsPlugin self = this;
-        taskHandle = getServer().getScheduler().scheduleRepeatingTask(self, this::poll,
+        if (pollTask != null) pollTask.cancel();
+        pollTask = getServer().getScheduler().scheduleRepeatingTask(this, this::poll,
                 (int) (pollInterval * 20), true);
     }
 
@@ -113,9 +114,9 @@ public final class GalaxyFollowsPlugin extends PluginBase implements Listener, c
         if (username.startsWith("@")) username = username.substring(1);
         rewardCommands = new ArrayList<>(getConfig().getStringList("galaxyfollows.reward-commands"));
         rewardMessage = getConfig().getString("galaxyfollows.reward-message", "");
-        pollInterval = Math.max(10, (long) getConfig().getInteger("galaxyfollows.poll-interval-seconds", 30));
-        maxAgeDays = Math.max(1, getConfig().getInteger("galaxyfollows.max-age-days", 30));
-        holdHours = Math.max(0, getConfig().getInteger("galaxyfollows.follow-hold-hours", 24));
+        pollInterval = Math.max(10, (long) getConfig().getInt("galaxyfollows.poll-interval-seconds", 30));
+        maxAgeDays = Math.max(1, getConfig().getInt("galaxyfollows.max-age-days", 30));
+        holdHours = Math.max(0, getConfig().getInt("galaxyfollows.follow-hold-hours", 24));
     }
 
     // ------------------------------------------------------------------ polling
@@ -223,7 +224,7 @@ public final class GalaxyFollowsPlugin extends PluginBase implements Listener, c
                 return;
             }
             deliver(id, player, followerHandle, watchedHandle);
-        }, false);
+        }, true);
     }
 
     private void deliver(String eventId, Player player, String followerHandle, String watchedHandle) {
@@ -234,7 +235,7 @@ public final class GalaxyFollowsPlugin extends PluginBase implements Listener, c
                         .replace("{handle}", followerHandle == null ? "" : followerHandle)
                         .replace("{account}", watchedHandle == null ? "" : watchedHandle);
                 if (cmd.isBlank()) continue;
-                getServer().dispatchCommand(new ConsoleCommandSender(), cmd);
+                getServer().executeCommand(new ConsoleCommandSender(), cmd);
             }
             if (rewardMessage != null && !rewardMessage.isBlank()) {
                 String msg = rewardMessage
@@ -275,7 +276,7 @@ public final class GalaxyFollowsPlugin extends PluginBase implements Listener, c
         if ("reload".equals(sub)) {
             readConfig();
             restartPoller();
-            sendPrefixed(sender, TextFormat.GREEN + "Config reloaded. Rewarding followers of: "
+            sendPrefixed(sender, "&aConfig reloaded. Rewarding followers of: "
                     + (isUsernameSet() ? username : "NOT SET (fix username in the config)"));
             return true;
         }
@@ -299,7 +300,7 @@ public final class GalaxyFollowsPlugin extends PluginBase implements Listener, c
     private record Result(boolean success, int status, Map<String, Object> json, String error) {}
 
     private static String color(String s) {
-        return s == null ? "" : TextFormat.translateAlternateColorCodes('&', s);
+        return s == null ? "" : TextFormat.colorize('&', s);
     }
 
     private Result post(String path, Object bodyObj) {
